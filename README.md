@@ -3,17 +3,16 @@ FashionablyLate（お問い合わせフォーム / 管理画面システム）
 
 ## 環境構築
 
-### Dockerビルド
+### Docker・Laravel環境構築
 * git clone https://github.com/rikom20/contact-form-app.git
-* docker-compose up -d --build
-
-### Laravel環境構築
-* docker-compose exec php bash
+* cp .env.example .env,環境変数を適宜変更
 * composer install
-* cp .env.example .env
-* php artisan key:generate
-* php artisan migrate
-* php artisan db:seed
+* ./vendor/bin/sail up -d(※ alias 設定済みの場合は sail up -d でも可,以下同)
+* ./vendor/bin/sail artisan key:generate
+
+### マイグレーションとダミーデータの投入
+* ./vendor/bin/sail artisan migrate
+* ./vendor/bin/sail artisan db:seed
 
 ### 開発環境（URL）
 * お問い合わせ画面：http://localhost/
