@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FashionablyLate - Admin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <!-- モーダルポップアップ制御用の軽量ライブラリ Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-[#f2efe9] text-[#5b4a42] min-h-screen" x-data="{ openModal: false, selectedContact: null }">
+<body class="bg-[#f2efe9] text-[#5b4a42] min-h-screen">
     <header class="py-6 border-b border-[#e5ded6] bg-white flex justify-between items-center px-12">
         <h1 class="text-3xl font-serif tracking-wide text-[#7d6b5d] mx-auto pl-20">FashionablyLate</h1>
         <form action="{{ route('logout') }}" method="POST">
@@ -87,7 +85,8 @@
                             <td class="p-4">{{ $contact->email }}</td>
                             <td class="p-4">{{ $contact->category ? $contact->category->content : '' }}</td>
                             <td class="p-4 text-right">
-                                <button @click="openModal = true; selectedContact = {{ json_encode($contact) }}" class="border border-[#d0c8be] bg-[#fdfbf9] text-[#a39385] px-4 py-1 rounded text-sm hover:bg-[#f4efe9]">
+                                <!-- ボタンの onclick イベントで標準JavaScript関数を実行 -->
+                                <button onclick='openModal({{ json_encode($contact) }})' class="border border-[#d0c8be] bg-[#fdfbf9] text-[#a39385] px-4 py-1 rounded text-sm hover:bg-[#f4efe9]">
                                     詳細
                                 </button>
                             </td>
@@ -98,36 +97,65 @@
         </div>
     </main>
 
-    <!-- 詳細表示モーダル -->
-    <div x-show="openModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-white rounded-lg shadow-xl max-w-xl w-full p-8 relative" @click.away="openModal = false">
-            <button @click="openModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-full w-8 h-8 flex items-center justify-center">×</button>
+    <!-- 詳細表示モーダル (hidden で非表示) -->
+    <div id="modalContainer" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-xl w-full p-8 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-full w-8 h-8 flex items-center justify-center">×</button>
 
-            <template x-if="selectedContact">
-                <div>
-                    <table class="w-full mb-8 text-left">
-                        <tr class="border-b"><th class="py-3 w-1/3 text-gray-500 font-bold">お名前</th><td class="py-3" x-text="selectedContact.first_name + ' ' + selectedContact.last_name"></td></tr>
-                        <tr class="border-b"><th class="py-3 text-gray-500 font-bold">性別</th><td class="py-3" x-text="selectedContact.gender == 1 ? '男性' : (selectedContact.gender == 2 ? '女性' : 'その他')"></td></tr>
-                        <tr class="border-b"><th class="py-3 text-gray-500 font-bold">メールアドレス</th><td class="py-3" x-text="selectedContact.email"></td></tr>
-                        <tr class="border-b"><th class="py-3 text-gray-500 font-bold">電話番号</th><td class="py-3" x-text="selectedContact.tel"></td></tr>
-                        <tr class="border-b"><th class="py-3 text-gray-500 font-bold">住所</th><td class="py-3" x-text="selectedContact.address"></td></tr>
-                        <tr class="border-b"><th class="py-3 text-gray-500 font-bold">建物名</th><td class="py-3" x-text="selectedContact.building ?? ''"></td></tr>
-                        <tr class="border-b"><th class="py-3 text-gray-500 font-bold">お問い合わせの種類</th><td class="py-3" x-text="selectedContact.category ? selectedContact.category.content : ''"></td></tr>
-                        <tr class="border-b"><th class="py-3 text-gray-500 font-bold">お問い合わせ内容</th><td class="py-3 whitespace-pre-wrap" x-text="selectedContact.detail"></td></tr>
-                    </table>
+            <div>
+                <table class="w-full mb-8 text-left">
+                    <tr class="border-b"><th class="py-3 w-1/3 text-gray-500 font-bold">お名前</th><td class="py-3" id="modalName"></td></tr>
+                    <tr class="border-b"><th class="py-3 text-gray-500 font-bold">性別</th><td class="py-3" id="modalGender"></td></tr>
+                    <tr class="border-b"><th class="py-3 text-gray-500 font-bold">メールアドレス</th><td class="py-3" id="modalEmail"></td></tr>
+                    <tr class="border-b"><th class="py-3 text-gray-500 font-bold">電話番号</th><td class="py-3" id="modalTel"></td></tr>
+                    <tr class="border-b"><th class="py-3 text-gray-500 font-bold">住所</th><td class="py-3" id="modalAddress"></td></tr>
+                    <tr class="border-b"><th class="py-3 text-gray-500 font-bold">建物名</th><td class="py-3" id="modalBuilding"></td></tr>
+                    <tr class="border-b"><th class="py-3 text-gray-500 font-bold">お問い合わせの種類</th><td class="py-3" id="modalCategory"></td></tr>
+                    <tr class="border-b"><th class="py-3 text-gray-500 font-bold">お問い合わせ内容</th><td class="py-3 whitespace-pre-wrap" id="modalDetail"></td></tr>
+                </table>
 
-                    <div class="text-center">
-                        <form :action="'/delete/' + selectedContact.id" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold py-2 px-8 rounded transition">
-                                削除
-                            </button>
-                        </form>
-                    </div>
+                <div class="text-center">
+                    <form id="deleteForm" action="" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold py-2 px-8 rounded transition">
+                            削除
+                        </button>
+                    </form>
                 </div>
-            </template>
+            </div>
         </div>
     </div>
+
+    <!-- 標準JavaScript処理 -->
+    <script>
+        function openModal(contact) {
+            // 性別の変換処理
+            let genderText = 'その他';
+            if (contact.gender == 1) genderText = '男性';
+            if (contact.gender == 2) genderText = '女性';
+
+            // 各要素への値のセット
+            document.getElementById('modalName').textContent = contact.first_name + ' ' + contact.last_name;
+            document.getElementById('modalGender').textContent = genderText;
+            document.getElementById('modalEmail').textContent = contact.email;
+            document.getElementById('modalTel').textContent = contact.tel;
+            document.getElementById('modalAddress').textContent = contact.address;
+            document.getElementById('modalBuilding').textContent = contact.building ? contact.building : '';
+            document.getElementById('modalCategory').textContent = contact.category ? contact.category.content : '';
+            document.getElementById('modalDetail').textContent = contact.detail;
+
+            // 削除用フォームのURLを更新
+            document.getElementById('deleteForm').action = '/delete/' + contact.id;
+
+            // モーダルを表示
+            document.getElementById('modalContainer').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            // モーダルを非表示
+            document.getElementById('modalContainer').classList.add('hidden');
+        }
+    </script>
 </body>
 </html>

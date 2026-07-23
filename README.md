@@ -38,7 +38,6 @@ erDiagram
         varchar content "NOT NULL"
         timestamp created_at
         timestamp updated_at
-        timestamp deleted_at
     }
     contacts {
         bigint id PK
@@ -53,7 +52,6 @@ erDiagram
         text detail "NOT NULL"
         timestamp created_at
         timestamp updated_at
-        timestamp deleted_at
     }
     users {
         bigint id PK
@@ -62,6 +60,5 @@ erDiagram
         varchar password "NOT NULL"
         timestamp created_at
         timestamp updated_at
-        timestamp deleted_at
     }
 ```
