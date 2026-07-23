@@ -27,7 +27,6 @@ FashionablyLate（お問い合わせフォーム / 管理画面システム）
 * Laravel 10.50.2
 * MySQL 8.4.10
 * Tailwind CSS
-* Alpine.js
 
 ### ER図
 ```mermaid
