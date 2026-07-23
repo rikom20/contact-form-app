@@ -9,10 +9,13 @@ FashionablyLate（お問い合わせフォーム / 管理画面システム）
 * composer install
 * ./vendor/bin/sail up -d(※ alias 設定済みの場合は sail up -d でも可,以下同)
 * ./vendor/bin/sail artisan key:generate
+* ./vendor/bin/sail npm install
+* ./vendor/bin/sail npm run dev
 
 ### マイグレーションとダミーデータの投入
 * ./vendor/bin/sail artisan migrate
 * ./vendor/bin/sail artisan db:seed
+
 
 ### 開発環境（URL）
 * お問い合わせ画面：http://localhost/
